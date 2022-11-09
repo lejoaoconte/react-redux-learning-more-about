@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Movies List</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      #moviesBody {
+        margin: 50px auto;
+        width: 50%;
+        min-width: 350px;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        gap: 10px;
+      }
+
+      #moviesBody > h1 {
+        text-align: center;
+
+        margin-bottom: 20px;
+      }
+
+      #movie {
+        width: 100%;
+        height: fit-content;
+        padding: 10px;
+      }
+
+      #movieButton {
+        width: fit-content;
+        padding: 10px 100px;
+
+        background-color: black;
+        color: white;
+        font-size: 18px;
+        font-weight: bolder;
+
+        border: 0;
+
+        cursor: pointer;
+      }
+
+      #movieButton:hover {
+        filter: brightness(0.6);
+      }
+
+      #movies {
+        width: 100%;
+        margin-top: 30px;
+        gap: 10px;
+
+        list-style-type: none;
+
+        display: flex;
+        flex-direction: column;
+      }
+
+      #movies > li {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+
+        gap: 15px;
+
+        font-size: 16px;
+      }
+
+      #movies > li > button {
+        background: none;
+        border: none;
+
+        font-weight: bolder;
+        cursor: pointer;
+        margin-left: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="moviesBody">
+      <h1>Movies List</h1>
+      <input id="movie" type="text" placeholder="Enter movie name" />
+      <button id="movieButton">Add Movie</button>
+      <ul id="movies"></ul>
+    </div>
+  </body>
+  <script src="./index.js"></script>
+  <script>
+    function addMovie() {
+      const input = document.getElementById("movie");
+      const name = input.value;
+      input.value = "";
+
+      store.dispatch(
+        addMovieAction({
+          id: new Date().getTime().toString(36),
+          name: name,
+          watched: false,
+        })
+      );
+    }
+
+    function watchedMovie(id) {
+      store.dispatch(watchedMovieAction(id));
+    }
+
+    function removeMovie(id) {
+      store.dispatch(removeMovieAction(id));
+    }
+
+    document.getElementById("movieButton").addEventListener("click", addMovie);
+
+    function updateMoviesListDOM(movie) {
+      const list = document.createElement("li");
+
+      const text = document.createTextNode(movie.name);
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.id = movie.id;
+      checkbox.onclick = () => watchedMovie(movie.id);
+      checkbox.checked = movie.watched;
+
+      const button = document.createElement("button");
+      button.innerText = "X";
+      button.onclick = () => removeMovie(movie.id);
+
+      list.appendChild(checkbox);
+      list.appendChild(text);
+      list.appendChild(button);
+
+      document.getElementById("movies").appendChild(list);
+    }
+  </script>
+</html>
