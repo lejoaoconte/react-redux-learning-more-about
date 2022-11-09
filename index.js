@@ -1,26 +1,3 @@
-function createStore(reducer) {
-  let state;
-  let listerners = [];
-
-  function getState() {
-    return state;
-  }
-
-  function subscribe(listerner) {
-    listerners.push(listerner);
-    return () => {
-      listerners = listerners.filter((l) => l !== listerner);
-    };
-  }
-
-  function dispatch(action) {
-    state = reducer(state, action);
-    listerners.forEach((listerner) => listerner());
-  }
-
-  return { getState, subscribe, dispatch };
-}
-
 const ADD_MOVIE = "ADD_MOVIE";
 const REMOVE_MOVIE = "REMOVE_MOVIE";
 const WHATCHED_MOVIE = "WHATCHED_MOVIE";
@@ -65,13 +42,11 @@ function movies(state = [], action) {
   }
 }
 
-function application(state = {}, action) {
-  return {
-    movies: movies(state.movies, action),
-  };
-}
-
-const store = createStore(application);
+const store = Redux.createStore(
+  Redux.combineReducers({
+    movies,
+  })
+);
 
 store.subscribe(() => {
   const { movies } = store.getState();
