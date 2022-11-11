@@ -72,11 +72,3 @@ const store = Redux.createStore(
   }),
   Redux.applyMiddleware(checker, logger)
 );
-
-store.subscribe(() => {
-  const { movies } = store.getState();
-
-  document.getElementById("movies").innerHTML = "";
-
-  movies.forEach(updateMoviesListDOM);
-});
