@@ -42,10 +42,35 @@ function movies(state = [], action) {
   }
 }
 
+const checker = (store) => (next) => (action) => {
+  if (
+    action.type === ADD_MOVIE &&
+    (action.movie.name.toLowerCase() === " " || //.includes("") ||
+      action.movie.name.toLowerCase() === "")
+  ) {
+    return alert("Pass a valid movie name");
+  }
+
+  return next(action);
+};
+
+const logger = (store) => (next) => (action) => {
+  console.group(action.type);
+
+  console.log("The action: ", action);
+  const result = next(action);
+  console.log("The new state: ", store.getState());
+
+  console.groupEnd();
+
+  return result;
+};
+
 const store = Redux.createStore(
   Redux.combineReducers({
     movies,
-  })
+  }),
+  Redux.applyMiddleware(checker, logger)
 );
 
 store.subscribe(() => {
@@ -54,5 +79,4 @@ store.subscribe(() => {
   document.getElementById("movies").innerHTML = "";
 
   movies.forEach(updateMoviesListDOM);
-  console.log(movies);
 });
