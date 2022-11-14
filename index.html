@@ -9,92 +9,13 @@
     <script src="https://unpkg.com/react@17.0.2/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@17.0.2/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone@7.17.6/babel.min.js"></script>
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      #moviesBody {
-        margin: 50px auto;
-        width: 50%;
-        min-width: 350px;
-
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-
-        gap: 10px;
-      }
-
-      #moviesBody > h1 {
-        text-align: center;
-
-        margin-bottom: 20px;
-      }
-
-      #movie {
-        width: 100%;
-        height: fit-content;
-        padding: 10px;
-      }
-
-      #movieButton {
-        width: fit-content;
-        padding: 10px 100px;
-
-        background-color: black;
-        color: white;
-        font-size: 18px;
-        font-weight: bolder;
-
-        border: 0;
-
-        cursor: pointer;
-      }
-
-      #movieButton:hover {
-        filter: brightness(0.6);
-      }
-
-      #movies {
-        width: 100%;
-        margin-top: 30px;
-        gap: 10px;
-
-        list-style-type: none;
-
-        display: flex;
-        flex-direction: column;
-      }
-
-      #movies > li {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: flex-start;
-
-        gap: 15px;
-
-        font-size: 16px;
-      }
-
-      #movies > li > button {
-        background: none;
-        border: none;
-
-        font-weight: bolder;
-        cursor: pointer;
-        margin-left: auto;
-      }
-    </style>
+    <link rel="stylesheet" href="./index.css" />
   </head>
   <body>
     <div id="app"></div>
   </body>
   <script src="./index.js"></script>
+  <script src="./fetchApi.js"></script>
   <script type="text/babel">
     const List = (props) => {
       return (
@@ -168,12 +89,20 @@
       const [value, setValue] = React.useState(0);
 
       React.useEffect(() => {
+        Promise.all([API.fetchMovies()]).then(([movies]) => {
+          props.store.dispatch(receiveDataAction(movies));
+        });
+
         props.store.subscribe(() => {
           setValue((value) => value + 1);
         });
       }, []);
 
-      const { movies } = store.getState();
+      const { movies, loading } = store.getState();
+
+      if (loading) {
+        return <h1 id="loading">Loading</h1>;
+      }
 
       return (
         <div>

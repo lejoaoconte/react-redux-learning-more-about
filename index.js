@@ -1,6 +1,7 @@
 const ADD_MOVIE = "ADD_MOVIE";
 const REMOVE_MOVIE = "REMOVE_MOVIE";
 const WHATCHED_MOVIE = "WHATCHED_MOVIE";
+const RECEIVE_DATA = "RECEIVE_DATA";
 
 function addMovieAction(movie) {
   return {
@@ -23,6 +24,13 @@ function watchedMovieAction(id) {
   };
 }
 
+function receiveDataAction(movies) {
+  return {
+    type: RECEIVE_DATA,
+    movies,
+  };
+}
+
 function movies(state = [], action) {
   switch (action.type) {
     case ADD_MOVIE:
@@ -37,6 +45,17 @@ function movies(state = [], action) {
           return Object.assign({}, movie, { watched: !movie.watched });
         }
       });
+    case RECEIVE_DATA:
+      return action.movies;
+    default:
+      return state;
+  }
+}
+
+function loading(state = true, action) {
+  switch (action.type) {
+    case RECEIVE_DATA:
+      return false;
     default:
       return state;
   }
@@ -69,6 +88,7 @@ const logger = (store) => (next) => (action) => {
 const store = Redux.createStore(
   Redux.combineReducers({
     movies,
+    loading,
   }),
   Redux.applyMiddleware(checker, logger)
 );
