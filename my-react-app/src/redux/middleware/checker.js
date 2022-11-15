@@ -1,3 +1,5 @@
+import { ADD_MOVIE } from "../actions/movies";
+
 export const checker = (store) => (next) => (action) => {
   if (
     action.type === ADD_MOVIE &&

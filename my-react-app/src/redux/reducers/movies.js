@@ -1,7 +1,7 @@
 import { ADD_MOVIE, REMOVE_MOVIE, WHATCHED_MOVIE } from "../actions/movies";
 import { RECEIVE_DATA } from "../actions/shared";
 
-export function movies(state = [], action) {
+export default function movies(state = [], action) {
   switch (action.type) {
     case ADD_MOVIE:
       return state.concat([action.movie]);
