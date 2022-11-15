@@ -10,6 +10,7 @@
     <script src="https://unpkg.com/react-dom@17.0.2/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone@7.17.6/babel.min.js"></script>
     <script src="https://unpkg.com/redux-thunk@2.2.0/dist/redux-thunk.min.js"></script>
+    <script src="https://unpkg.com/react-redux@7.2.6/dist/react-redux.min.js"></script>
     <link rel="stylesheet" href="./css/index.css" />
   </head>
   <body>
@@ -44,17 +45,17 @@
 
       const handleAddMovie = (e) => {
         e.preventDefault();
-        store.dispatch(
+        props.dispatch(
           addMovie(inputRef.current.value, () => (inputRef.current.value = ""))
         );
       };
 
       const handleRemoveMovie = (movie) => {
-        store.dispatch(deleteMovie(movie));
+        props.dispatch(deleteMovie(movie));
       };
 
       const handleWatchedMovie = (movie) => {
-        store.dispatch(watchedMovie(movie.id));
+        props.dispatch(watchedMovie(movie.id));
       };
 
       return (
@@ -80,30 +81,83 @@
       );
     };
 
-    const App = (props) => {
-      const [value, setValue] = React.useState(0);
+    const ConnectedMovies = connect((state) => ({
+      movies: state.movies,
+    }))(Movies);
 
+    const App = (props) => {
       React.useEffect(() => {
         store.dispatch(getInitialData());
-
-        store.subscribe(() => {
-          setValue((value) => value + 1);
-        });
       }, []);
 
-      const { movies, loading } = store.getState();
-
-      if (loading) {
+      if (props.loading) {
         return <h1 id="loading">Loading</h1>;
       }
 
       return (
         <div>
-          <Movies movies={movies} store={props.store} />
+          <ConnectedMovies />
         </div>
       );
     };
 
-    ReactDOM.render(<App store={store} />, document.getElementById("app"));
+    const ConnectedApp = connect((state) => ({
+      loading: state.loading,
+    }))(App);
+
+    const Context = React.createContext();
+
+    function connect(mapStateToProps) {
+      return (Component) => {
+        const Receiver = (props) => {
+          const [value, setValue] = React.useState(0);
+
+          React.useEffect(() => {
+            let unmounted = false;
+            const { subscribe } = props.store;
+
+            const unsubscribe = subscribe(() => {
+              setValue((value) => value + 1);
+            });
+
+            return () => {
+              unsubscribe();
+              unmounted = true;
+            };
+          }, []);
+
+          const { dispatch, getState } = props.store;
+          const state = getState();
+          const stateNeeded = mapStateToProps(state);
+
+          return <Component {...stateNeeded} dispatch={dispatch} />;
+        };
+
+        const ConnectedComponent = () => {
+          return (
+            <Context.Consumer>
+              {(store) => <Receiver store={store} />}
+            </Context.Consumer>
+          );
+        };
+
+        return ConnectedComponent;
+      };
+    }
+
+    const Provider = (props) => {
+      return (
+        <Context.Provider value={props.store}>
+          {props.children}
+        </Context.Provider>
+      );
+    };
+
+    ReactDOM.render(
+      <Provider store={store}>
+        <ConnectedApp />
+      </Provider>,
+      document.getElementById("app")
+    );
   </script>
 </html>
