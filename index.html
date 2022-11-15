@@ -81,7 +81,7 @@
       );
     };
 
-    const ConnectedMovies = connect((state) => ({
+    const ConnectedMovies = ReactRedux.connect((state) => ({
       movies: state.movies,
     }))(Movies);
 
@@ -101,62 +101,14 @@
       );
     };
 
-    const ConnectedApp = connect((state) => ({
+    const ConnectedApp = ReactRedux.connect((state) => ({
       loading: state.loading,
     }))(App);
 
-    const Context = React.createContext();
-
-    function connect(mapStateToProps) {
-      return (Component) => {
-        const Receiver = (props) => {
-          const [value, setValue] = React.useState(0);
-
-          React.useEffect(() => {
-            let unmounted = false;
-            const { subscribe } = props.store;
-
-            const unsubscribe = subscribe(() => {
-              setValue((value) => value + 1);
-            });
-
-            return () => {
-              unsubscribe();
-              unmounted = true;
-            };
-          }, []);
-
-          const { dispatch, getState } = props.store;
-          const state = getState();
-          const stateNeeded = mapStateToProps(state);
-
-          return <Component {...stateNeeded} dispatch={dispatch} />;
-        };
-
-        const ConnectedComponent = () => {
-          return (
-            <Context.Consumer>
-              {(store) => <Receiver store={store} />}
-            </Context.Consumer>
-          );
-        };
-
-        return ConnectedComponent;
-      };
-    }
-
-    const Provider = (props) => {
-      return (
-        <Context.Provider value={props.store}>
-          {props.children}
-        </Context.Provider>
-      );
-    };
-
     ReactDOM.render(
-      <Provider store={store}>
+      <ReactRedux.Provider store={store}>
         <ConnectedApp />
-      </Provider>,
+      </ReactRedux.Provider>,
       document.getElementById("app")
     );
   </script>
