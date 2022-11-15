@@ -42,24 +42,33 @@
 
       const handleAddMovie = (e) => {
         e.preventDefault();
-        const name = inputRef.current.value;
-        inputRef.current.value = "";
-
-        props.store.dispatch(
-          addMovieAction({
-            id: new Date().getTime().toString(36),
-            name: name,
-            watched: false,
+        return API.saveMovie(inputRef.current.value)
+          .then((movie) => {
+            console.log(movie)
+            store.dispatch(addMovieAction(movie));
+            inputRef.current.value = "";
           })
-        );
+          .catch(() => {
+            alert("Error! Please try again!");
+          });
       };
 
       const handleRemoveMovie = (movie) => {
         store.dispatch(removeMovieAction(movie.id));
+
+        return API.deleteMovie(movie.id).catch(() => {
+          store.dispatch(addMovieAction(movie));
+          alert("Error! Please try again!");
+        });
       };
 
       const handleWatchedMovie = (movie) => {
         store.dispatch(watchedMovieAction(movie.id));
+
+        return API.saveMovieWatched(movie.id).catch(() => {
+          store.dispatch(watchedMovieAction(movie.id));
+          alert("Error! Please try again!");
+        });
       };
 
       return (

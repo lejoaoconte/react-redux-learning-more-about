@@ -58,7 +58,7 @@
     });
   };
 
-  API.sevaMovieWatched = function (id) {
+  API.saveMovieWatched = function (id) {
     return new Promise((res, rej) => {
       setTimeout(() => {
         movies = movies.map((todo) =>
