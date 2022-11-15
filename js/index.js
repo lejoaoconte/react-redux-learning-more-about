@@ -31,6 +31,48 @@ function receiveDataAction(movies) {
   };
 }
 
+function deleteMovie(movie) {
+  return (dispatch) => {
+    dispatch(removeMovieAction(movie.id));
+
+    return API.deleteMovie(movie.id).catch(() => {
+      dispatch(addMovieAction(movie));
+      alert("Error! Please try again!");
+    });
+  };
+}
+
+function addMovie(name, func) {
+  return (dispatch) => {
+    return API.saveMovie(name)
+      .then((movie) => {
+        dispatch(addMovieAction(movie));
+        func();
+      })
+      .catch(() => {
+        alert("Error! Please try again!");
+      });
+  };
+}
+
+function watchedMovie(id) {
+  return (dispatch) => {
+    dispatch(watchedMovieAction(id));
+
+    return API.saveMovieWatched(id).catch(() => {
+      store.dispatch(watchedMovieAction(id));
+      alert("Error! Please try again!");
+    });
+  };
+}
+
+function getInitialData() {
+  return async (dispatch) => {
+    const [movies] = await Promise.all([API.fetchMovies()]);
+    dispatch(receiveDataAction(movies));
+  };
+}
+
 function movies(state = [], action) {
   switch (action.type) {
     case ADD_MOVIE:
@@ -90,5 +132,5 @@ const store = Redux.createStore(
     movies,
     loading,
   }),
-  Redux.applyMiddleware(checker, logger)
+  Redux.applyMiddleware(ReduxThunk.default, checker, logger)
 );

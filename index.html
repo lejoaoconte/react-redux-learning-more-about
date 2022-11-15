@@ -9,13 +9,14 @@
     <script src="https://unpkg.com/react@17.0.2/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@17.0.2/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone@7.17.6/babel.min.js"></script>
-    <link rel="stylesheet" href="./index.css" />
+    <script src="https://unpkg.com/redux-thunk@2.2.0/dist/redux-thunk.min.js"></script>
+    <link rel="stylesheet" href="./css/index.css" />
   </head>
   <body>
     <div id="app"></div>
   </body>
-  <script src="./index.js"></script>
-  <script src="./fetchApi.js"></script>
+  <script src="./js/index.js"></script>
+  <script src="./js/fetchApi.js"></script>
   <script type="text/babel">
     const List = (props) => {
       return (
@@ -26,7 +27,8 @@
                   <input
                     type="checkbox"
                     id={item.id}
-                    onClick={() => props.watched(item)}
+                    checked={item.watched}
+                    onChange={() => props.watched(item)}
                   />
                   {item.name}
                   <button onClick={() => props.remove(item)}>X</button>
@@ -42,33 +44,17 @@
 
       const handleAddMovie = (e) => {
         e.preventDefault();
-        return API.saveMovie(inputRef.current.value)
-          .then((movie) => {
-            console.log(movie)
-            store.dispatch(addMovieAction(movie));
-            inputRef.current.value = "";
-          })
-          .catch(() => {
-            alert("Error! Please try again!");
-          });
+        store.dispatch(
+          addMovie(inputRef.current.value, () => (inputRef.current.value = ""))
+        );
       };
 
       const handleRemoveMovie = (movie) => {
-        store.dispatch(removeMovieAction(movie.id));
-
-        return API.deleteMovie(movie.id).catch(() => {
-          store.dispatch(addMovieAction(movie));
-          alert("Error! Please try again!");
-        });
+        store.dispatch(deleteMovie(movie));
       };
 
       const handleWatchedMovie = (movie) => {
-        store.dispatch(watchedMovieAction(movie.id));
-
-        return API.saveMovieWatched(movie.id).catch(() => {
-          store.dispatch(watchedMovieAction(movie.id));
-          alert("Error! Please try again!");
-        });
+        store.dispatch(watchedMovie(movie.id));
       };
 
       return (
@@ -98,11 +84,9 @@
       const [value, setValue] = React.useState(0);
 
       React.useEffect(() => {
-        Promise.all([API.fetchMovies()]).then(([movies]) => {
-          props.store.dispatch(receiveDataAction(movies));
-        });
+        store.dispatch(getInitialData());
 
-        props.store.subscribe(() => {
+        store.subscribe(() => {
           setValue((value) => value + 1);
         });
       }, []);
