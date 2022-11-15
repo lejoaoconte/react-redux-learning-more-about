@@ -1,4 +1,4 @@
-import API from "../../services/api";
+import { deleteMovies, saveMovie, saveMovieWatched } from "../../services/api";
 
 export const ADD_MOVIE = "ADD_MOVIE";
 export const REMOVE_MOVIE = "REMOVE_MOVIE";
@@ -26,36 +26,39 @@ function watchedMovieAction(id) {
 }
 
 export function deleteMovie(movie) {
-  return (dispatch) => {
+  return async (dispatch) => {
     dispatch(removeMovieAction(movie.id));
 
-    return API.deleteMovie(movie.id).catch(() => {
+    try {
+      return await deleteMovies(movie.id);
+    } catch {
       dispatch(addMovieAction(movie));
       alert("Error! Please try again!");
-    });
+    }
   };
 }
 
 export function addMovie(name, func) {
-  return (dispatch) => {
-    return API.saveMovie(name)
-      .then((movie) => {
-        dispatch(addMovieAction(movie));
-        func();
-      })
-      .catch(() => {
-        alert("Error! Please try again!");
-      });
+  return async (dispatch) => {
+    try {
+      const movie = await saveMovie(name);
+      dispatch(addMovieAction(movie));
+      func();
+    } catch {
+      alert("Error! Please try again!");
+    }
   };
 }
 
 export function watchedMovie(id) {
-  return (dispatch) => {
+  return async (dispatch) => {
     dispatch(watchedMovieAction(id));
 
-    return API.saveMovieWatched(id).catch(() => {
-      store.dispatch(watchedMovieAction(id));
+    try {
+      return await saveMovieWatched(id);
+    } catch {
+      dispatch(watchedMovieAction(id));
       alert("Error! Please try again!");
-    });
+    }
   };
 }

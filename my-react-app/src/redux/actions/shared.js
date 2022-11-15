@@ -1,4 +1,4 @@
-import API from "../../services/api";
+import { fetchMovies } from "../../services/api";
 
 export const RECEIVE_DATA = "RECEIVE_DATA";
 
@@ -9,9 +9,9 @@ function receiveDataAction(movies) {
   };
 }
 
-function getInitialData() {
+export function getInitialData() {
   return async (dispatch) => {
-    const [movies] = await Promise.all([API.fetchMovies()]);
+    const [movies] = await Promise.all([fetchMovies()]);
     dispatch(receiveDataAction(movies));
   };
 }
