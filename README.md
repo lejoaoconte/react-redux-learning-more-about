@@ -13,7 +13,7 @@ However at the <a href="https://github.com/lejoaoconte/react-redux-learning-more
 Finally it's good to know that I altered the concept of project approached at the course which the idea was create a todo/goals list, but I converted to a movies list, it's involved a modify the API part to fit in I wanted.
 
 Illustrations below:
-<img src="https://raw.githubusercontent.com/lejoaoconte/react-chirper-app/main/image.png?token=GHSAT0AAAAAABZ5QISBNEWLTK27AH2IU2T2Y3W2MOQ" alt="illustration" />
+<img src="https://github.com/lejoaoconte/react-redux-learning-more-about/blob/main/image.png?raw=true" alt="illustration" />
 
 ## Getting Started
 
